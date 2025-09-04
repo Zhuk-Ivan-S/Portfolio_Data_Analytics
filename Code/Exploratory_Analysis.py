@@ -115,3 +115,4 @@ avg_pay = df.groupby('payment_type')['price'].mean()
 print(avg_pay)
 
 # thet's give some notice for analyze in future
+conn.close()

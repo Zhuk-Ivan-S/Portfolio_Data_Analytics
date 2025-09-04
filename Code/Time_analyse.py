@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 import sqlite3
 
 from numpy.ma.core import count
@@ -154,3 +153,5 @@ plt.show()
 # the stated delivery times. This is a competitive advantage.
 # 6. Despite the overall positive picture, it is worth analyzing exceptional cases with long deliveries
 # to understand their reasons (geography, product category, seasonal peaks).
+
+conn.close()
