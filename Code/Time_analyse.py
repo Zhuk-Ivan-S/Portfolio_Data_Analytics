@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sqlite3
 
+from numpy.ma.core import count
+
 # I want to work with time dataset in order to understand the patterns of peak orders and the
 # differentiation of customer activity, the data of the study allow more productive use of marketing
 # tools to improve one's position in the market and efficient use of resources
@@ -36,7 +38,7 @@ print(time_df.head(10))
 time_df['order_purchase_timestamp'] = pd.to_datetime(time_df['order_purchase_timestamp'])
 time_df['order_approved_at'] = pd.to_datetime(time_df['order_approved_at'])
 time_df['order_delivered_customer_date'] = pd.to_datetime(time_df['order_delivered_customer_date'])
-time_df['order_estimated_delivery_date'] = pd.to_datetime(time_df['order_delivered_customer_date'])
+time_df['order_estimated_delivery_date'] = pd.to_datetime(time_df['order_estimated_delivery_date'])
 
 # Separate time into (years, months, days, hours) order purchase and analyse
 time_df['year'] = time_df['order_purchase_timestamp'].dt.year
@@ -79,3 +81,76 @@ time_df['time_of_day'].value_counts().sort_values().plot(kind='bar',figsize = (1
 plt.show()
 
 # Naturally, most orders are made in the evening from 5 to 11 p.m. (free time after work)
+# Combo : make heatmap and see orders sorted by day of week and hours
+# Create pivot table
+pivot = time_df.pivot_table(index = 'day_o_w',columns = 'time_of_day', values= 'order_id',aggfunc='count',fill_value=0)
+order_days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+pivot = pivot.reindex(order_days)
+
+plt.figure(figsize = (8,11))
+plt.imshow(pivot)
+plt.xticks(range(len(pivot.columns)),pivot.columns,rotation = 25)
+plt.yticks(range(len(pivot.index)),pivot.index)
+plt.colorbar(label='Number of Orders')
+plt.title('Orders by day of week and hours')
+plt.show()
+# Now I make time analyse for delivery time and make some insights
+
+# proportion of delays. I need clean data without info about canceled orders order not completed
+df_c_time = time_df.dropna(subset=['order_delivered_customer_date','order_purchase_timestamp','order_estimated_delivery_date']).copy()
+print(df_c_time.head(10))
+
+# Change metrics in datetime (days):
+# How much day need from purchase date to delivery date - that give some info about logistic
+df_c_time.loc[:, 'delivery_days'] = (df_c_time['order_delivered_customer_date']-df_c_time['order_purchase_timestamp']).dt.days
+average_delivery = df_c_time['delivery_days'].mean()
+print(f'Average delivery time - {average_delivery} days')
+# what is the difference between the expectation and the actual delivery,
+# which will allow you to evaluate the speed and quality of logistics services
+# ('+' value will be positive, '-' will be negative for logistics evaluation)
+
+df_c_time.loc[:,'estimate_time'] = (df_c_time['order_estimated_delivery_date'] - df_c_time['order_purchase_timestamp']).dt.days
+df_c_time.loc[:,'faster_days'] = (df_c_time['order_estimated_delivery_date']-df_c_time['order_delivered_customer_date']).dt.days
+df_c_time.loc[:,'delay_days'] = (df_c_time['order_delivered_customer_date'] - df_c_time['order_estimated_delivery_date']).dt.days
+plt.figure(figsize=(10,7))
+plt.boxplot(df_c_time['delivery_days'].dropna(),vert=False)
+plt.title('Distribution of Delivery Time')
+plt.xlabel('Days')
+plt.show()
+# time is different
+# first try of
+avg_faster_del = (df_c_time['estimate_time']-df_c_time['faster_days']).mean()
+print(f'Faster delivery average - {avg_faster_del} days')
+# Percentage of delivery efficient
+p_f_d = ((df_c_time['estimate_time']-df_c_time['delivery_days'])/df_c_time['estimate_time']) * 100
+print(f'Percentage of delivery efficient - {p_f_d.mean()} %')
+counts = []
+for late in df_c_time['delay_days']:
+    if late > 0 :
+        counts.append(late)
+late_count = len(counts)
+print(f'Late delivery count - {late_count} orders/{df_c_time['delay_days'].value_counts().sum()} orders')
+# proportion of delays
+late_deliveries = (df_c_time['delay_days'] > 0).mean() * 100
+print(f'proportion of delays - {late_deliveries} %')
+# visualization histogram for showing how often orders arrive ahead of schedule
+plt.figure(figsize=(10,8))
+df_c_time['faster_days'].hist(bins = 10, edgecolor = 'black')
+plt.title('Distribution of faster delivery')
+plt.xlabel('Days faster as plan')
+plt.ylabel('Count of orders')
+plt.show()
+
+# Insights :
+# 1.Order activity is recorded according to the season (this may be related to holidays,
+# promotions, and advantageous offers)
+# 2. Most orders are placed in the evening (5:00 PM–11:00 PM), which indicates customer activity after work.
+# This can be a key time for targeted promotions and marketing campaigns.
+# 3. The average faster delivery time was about 12 days, which is in most
+# cases less than the expected time. This indicates good logistics efficiency.
+# 4.On average, orders arrive 12 days faster than predicted, which can increase
+# customer satisfaction and increase their loyalty. Percentage of delivery efficient - 47.23 %
+# 5. The proportion of delays is 6.73 %, meaning the company consistently adheres to
+# the stated delivery times. This is a competitive advantage.
+# 6. Despite the overall positive picture, it is worth analyzing exceptional cases with long deliveries
+# to understand their reasons (geography, product category, seasonal peaks).
