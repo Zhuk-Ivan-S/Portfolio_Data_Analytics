@@ -18,20 +18,21 @@ The analysis was performed using Python (Pycharm)(Jupyter Notebook) with SQL int
  • Presentation: PowerPoint
 
  ## Project Structure 🗃️
- ''' Code
- ┣ Demografic_analyse.py                                -   Python file with Demografic analyse
- ┣ Exploatory_Analyse.py                                -   Python file with Exploatory (Basic) Analyse
- ┣ Intro_preparing_and_cleaning                         -   Python file with first view and understandig of information
- ┣ Rating_analyse.py                                    -   Python file with analyse of Ratings (Orders ant grades from Customers)
- ┣ Sellers.py                                           -   Python file with Sallers analyse and information
- ┣ Time_analyse.py                                      -   Python file with time analyse 
- ┣ Future_predict.py                                    -   Python file with predictions (Linear regression/ mean)
-  DataSet
- ┣ db files                                             -   Data Base
- ┣ csv files                                            -   sources of information
-  results
- ┣ E-commerce Analyse (Brazil).ipynb                    -  Jupiter Notebook file with results of code
- ┣ E-commerce Analyse (Brazil)(without results).ipynb   -  Jupiter Notebook file without results of code '''
+ 📦 Portfolio_Data_Analytics
+┣ 📂 Code
+┃ ┣ 📜 Demografic_analyse.py                             # Demographic analysis
+┃ ┣ 📜 Exploratory_Analyse.py                            # Exploratory (basic) analysis
+┃ ┣ 📜 Intro_preparing_and_cleaning.py                   # Data preparation & cleaning
+┃ ┣ 📜 Rating_analyse.py                                 # Reviews & ratings analysis
+┃ ┣ 📜 Sellers.py                                        # Sellers analysis
+┃ ┣ 📜 Time_analyse.py                                   # Time-based analysis
+┃ ┣ 📜 Future_predict.py                                 # Forecasting (linear regression / mean)
+┣ 📂 DataSet                                             # Original Olist dataset
+┣  db files                                              # SQLite database files
+┣  csv files                                             # Processed CSV exports
+┣ 📜 E-commerce Analyse (Brazil).ipynb                   # Jupyter Notebook with results
+┣ 📜 E-commerce Analyse (Brazil without results).ipynb   # Clean notebook
+┗ 📜 README.md
 
  Key Stages of Analysis
 
