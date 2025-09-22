@@ -18,6 +18,7 @@ The analysis was performed using Python (Pycharm)(Jupyter Notebook) with SQL int
  • Presentation: PowerPoint
 
  ## Project Structure 🗃️
+ ```
  📦 Portfolio_Data_Analytics
 ┣ 📂 Code
 ┃ ┣ 📜 Demografic_analyse.py                             # Demographic analysis
@@ -33,7 +34,7 @@ The analysis was performed using Python (Pycharm)(Jupyter Notebook) with SQL int
 ┣ 📜 E-commerce Analyse (Brazil).ipynb                   # Jupyter Notebook with results
 ┣ 📜 E-commerce Analyse (Brazil without results).ipynb   # Clean notebook
 ┗ 📜 README.md
-
+```
  Key Stages of Analysis
 
 1. Time Analysis
