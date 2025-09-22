@@ -18,20 +18,20 @@ The analysis was performed using Python (Pycharm)(Jupyter Notebook) with SQL int
  • Presentation: PowerPoint
 
  Project Strukture 🗃️
- -- Code
-    --- Demografic_analyse.py                                -   Python file with Demografic analyse
-    --- Exploatory_Analyse.py                                -   Python file with Exploatory (Basic) Analyse
-    --- Intro_preparing_and_cleaning                         -   Python file with first view and understandig of information
-    --- Rating_analyse.py                                    -   Python file with analyse of Ratings (Orders ant grades from Customers)
-    --- Sellers.py                                           -   Python file with Sallers analyse and information
-    --- Time_analyse.py                                      -   Python file with time analyse 
-    --- Future_predict.py                                    -   Python file with predictions (Linear regression/ mean)
- -- DataSet
-    --- db files                                             -   Data Base
-    --- csv files                                            -   sources of information
- -- results
-    --- E-commerce Analyse (Brazil).ipynb                    -  Jupiter Notebook file with results of code
-    --- E-commerce Analyse (Brazil)(without results).ipynb   -  Jupiter Notebook file without results of code
+ Code
+ --- Demografic_analyse.py                                -   Python file with Demografic analyse
+ --- Exploatory_Analyse.py                                -   Python file with Exploatory (Basic) Analyse
+ --- Intro_preparing_and_cleaning                         -   Python file with first view and understandig of information
+ --- Rating_analyse.py                                    -   Python file with analyse of Ratings (Orders ant grades from Customers)
+ --- Sellers.py                                           -   Python file with Sallers analyse and information
+ --- Time_analyse.py                                      -   Python file with time analyse 
+ --- Future_predict.py                                    -   Python file with predictions (Linear regression/ mean)
+ DataSet
+ --- db files                                             -   Data Base
+ --- csv files                                            -   sources of information
+ results
+ --- E-commerce Analyse (Brazil).ipynb                    -  Jupiter Notebook file with results of code
+ --- E-commerce Analyse (Brazil)(without results).ipynb   -  Jupiter Notebook file without results of code
 
  Key Stages of Analysis
 
