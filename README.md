@@ -17,6 +17,24 @@ The analysis was performed using Python (Pycharm)(Jupyter Notebook) with SQL int
  • Visualization: Matplotlib, Folium, Power BI
  • Presentation: PowerPoint
 
+ ## Project Structure 🗃️
+ ```
+ 📦 Portfolio_Data_Analytics
+┣ 📂 Code
+┃ ┣ 📜 Demografic_analyse.py                             # Demographic analysis
+┃ ┣ 📜 Exploratory_Analyse.py                            # Exploratory (basic) analysis
+┃ ┣ 📜 Intro_preparing_and_cleaning.py                   # Data preparation & cleaning
+┃ ┣ 📜 Rating_analyse.py                                 # Reviews & ratings analysis
+┃ ┣ 📜 Sellers.py                                        # Sellers analysis
+┃ ┣ 📜 Time_analyse.py                                   # Time-based analysis
+┃ ┣ 📜 Future_predict.py                                 # Forecasting (linear regression / mean)
+┣ 📂 DataSet                                             # Original Olist dataset
+┣  db files                                              # SQLite database files
+┣  csv files                                             # Processed CSV exports
+┣ 📜 E-commerce Analyse (Brazil).ipynb                   # Jupyter Notebook with results
+┣ 📜 E-commerce Analyse (Brazil without results).ipynb   # Clean notebook
+┗ 📜 README.md
+```
  Key Stages of Analysis
 
 1. Time Analysis
