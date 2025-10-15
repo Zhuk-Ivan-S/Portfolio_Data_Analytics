@@ -157,7 +157,7 @@ monthly_avg_ticket['month']= monthly_avg_ticket['month'].dt.to_timestamp()
 avg_value = monthly_avg_ticket['revenue'].mean()
 # predict for 6 month
 future_dates = pd.date_range(start=monthly_avg_ticket['month'].iloc[-1] + pd.offsets.MonthBegin(1), periods=6, freq='MS')
-forecast_df = pd.DataFrame({'month': future_dates,'avg_ticket_forecast': [avg_value] * 6})
+forrecast_df = pd.DataFrame({'month': future_dates,'avg_ticket_forecast': [avg_value] * 6})
 
 print("Mean value:", avg_value)
 print(forecast_df)
@@ -165,7 +165,7 @@ print(forecast_df)
 plt.figure(figsize=(8,5))
 plt.plot(monthly_avg_ticket['month'], monthly_avg_ticket['revenue'], label='Fact')
 plt.hlines(avg_value, monthly_avg_ticket['month'].min(), future_dates[-1], colors='red', linestyles='dashed', label='Mean (predict)')
-plt.scatter(forecast_df['month'], forecast_df['avg_ticket_forecast'], color='orange', label='Predict')
+plt.scatter(forrecast_df['month'], forrecast_df['avg_ticket_forecast'], color='orange', label='Predict')
 plt.title('Predict average check')
 plt.xlabel('Month')
 plt.ylabel('Average check')
@@ -180,3 +180,103 @@ plt.show()
 # Analysis and forecasting of basic indicators (revenue, number of orders and average check) allows companies to
 # formulate the right approach in terms of marketing, logistics, and choice of strategies. In the future, it is
 # possible to analyze products that will be in the greatest demand in the future and for which demand is growing.
+df['order_purchase_timestamp'] = pd.to_datetime(df['order_purchase_timestamp'])
+df['month'] = df['order_purchase_timestamp'].dt.to_period('M')
+df['revenue'] = df['price'] + df['freight_value']
+
+# Monthly orders
+monthly_order = df.groupby('month')['order_id'].nunique().reset_index()
+monthly_order['month'] = monthly_order['month'].dt.to_timestamp()
+monthly_order['month_num'] = np.arange(len(monthly_order))
+
+# Monthly AOV
+monthly_aov = df.groupby('month').agg({'revenue':'sum','order_id':'nunique'}).reset_index()
+monthly_aov['AOV'] = monthly_aov['revenue'] / monthly_aov['order_id']
+monthly_aov['month'] = monthly_aov['month'].dt.to_timestamp()
+monthly_aov['month_num'] = np.arange(len(monthly_aov))
+
+# Monthly revenue
+monthly_revenue = df.groupby('month')['revenue'].sum().reset_index()
+monthly_revenue['month'] = monthly_revenue['month'].dt.to_timestamp()
+
+# Monthly customers (якщо є поле customer_id)
+monthly_customers = df.groupby('month')['customer_id'].nunique().reset_index(name='unique_customers')
+monthly_customers['month'] = monthly_customers['month'].dt.to_timestamp()
+
+# Monthly items per order
+monthly_items_per_order = df.groupby('month').agg({'order_id':'nunique','order_item_id':'count'}).reset_index()
+monthly_items_per_order['items_per_order'] = monthly_items_per_order['order_item_id'] / monthly_items_per_order['order_id']
+monthly_items_per_order['month'] = monthly_items_per_order['month'].dt.to_timestamp()
+
+# ========== Прогнози ==========
+future_dates = pd.date_range(start=monthly_order['month'].iloc[-1] + pd.offsets.MonthBegin(1),
+                             periods=6, freq='MS')
+
+# --- Orders (Linear Regression) ---
+X_orders = monthly_order[['month_num']]
+y_orders = monthly_order['order_id']
+model_orders = LinearRegression().fit(X_orders, y_orders)
+future_orders = model_orders.predict(np.arange(len(monthly_order), len(monthly_order)+6).reshape(-1,1))
+future_orders_df = pd.DataFrame({'month': future_dates, 'orders': future_orders})
+
+# --- AOV (Linear Regression) ---
+X_aov = monthly_aov[['month_num']]
+y_aov = monthly_aov['AOV']
+model_aov = LinearRegression().fit(X_aov, y_aov)
+future_aov = model_aov.predict(np.arange(len(monthly_aov), len(monthly_aov)+6).reshape(-1,1))
+future_aov_df = pd.DataFrame({'month': future_dates, 'AOV': future_aov})
+
+# --- Revenue forecast = Orders × AOV ---
+revenue_forecast = future_orders_df.merge(future_aov_df, on="month", how="inner")
+revenue_forecast['revenue'] = revenue_forecast['orders'] * revenue_forecast['AOV']
+
+# --- Customers (Mean forecast) ---
+avg_customers = monthly_customers['unique_customers'].mean()
+future_customers_df = pd.DataFrame({
+    'month': future_dates,
+    'unique_customers': [avg_customers]*len(future_dates)
+})
+
+# --- Items per order (Mean forecast) ---
+avg_items = monthly_items_per_order['items_per_order'].mean()
+future_items_df = pd.DataFrame({
+    'month': future_dates,
+    'items_per_order': [avg_items]*len(future_dates)
+})
+
+# ========== Підготовка до експорту ==========
+# Orders
+orders_export = pd.concat([
+    monthly_order[['month','order_id']].rename(columns={'order_id':'value'}).assign(type='fact_orders'),
+    future_orders_df[['month','orders']].rename(columns={'orders':'value'}).assign(type='forecast_orders')
+])
+
+# AOV
+aov_export = pd.concat([
+    monthly_aov[['month','AOV']].rename(columns={'AOV':'value'}).assign(type='fact_aov'),
+    future_aov_df[['month','AOV']].rename(columns={'AOV':'value'}).assign(type='forecast_aov')
+])
+
+# Revenue
+revenue_export = pd.concat([
+    monthly_revenue.rename(columns={'revenue':'value'}).assign(type='fact_revenue'),
+    revenue_forecast[['month','revenue']].rename(columns={'revenue':'value'}).assign(type='forecast_revenue')
+])
+
+# Customers
+customers_export = pd.concat([
+    monthly_customers.rename(columns={'unique_customers':'value'}).assign(type='fact_customers'),future_customers_df.rename(columns={'unique_customers':'value'}).assign(type='forecast_customers')
+])
+
+# Items per order
+items_export = pd.concat([
+    monthly_items_per_order[['month','items_per_order']].rename(columns={'items_per_order':'value'}).assign(type='fact_items_per_order'),
+    future_items_df.rename(columns={'items_per_order':'value'}).assign(type='forecast_items_per_order')
+])
+
+# Об'єднання всіх даних
+export_df = pd.concat([orders_export, aov_export, revenue_export, customers_export, items_export])
+
+# Збереження в CSV
+export_df.to_csv("forecast1_tableau.csv", index=False)
+print("✅ Дані збережено у forecast_tableau.csv")

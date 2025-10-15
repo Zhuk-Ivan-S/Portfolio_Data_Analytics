@@ -28,7 +28,7 @@ labels = {'Very bad':1,'Bad': 2,'Normal':3,'Good':4,'Very good':5}
 plt.pie(x = df_reviews['review_score'],labels=labels , autopct='%1.1f%%')
 plt.title('Percentage of reviews')
 plt.show()
-
+df_reviews.to_csv('../DataSet/review1.csv')
 # Most customer reviews are positive, with 33.3% rating 5 (very good), 26.7% rating 4 (good),
 # and only 20% (6.7% very bad and 13.3% bad) having negative reviews. Overall, these are positive
 # indicators, it is worth exploring these metrics more deeply and finding out what the patterns are.
@@ -47,7 +47,7 @@ Order by avg_review_score DESC;
 
 df_rev_avg = pd.read_sql_query(query_rev_b_p,conn)
 print(df_rev_avg.head(10))
-
+df_rev_avg.to_csv('../DataSet/review2.csv')
 # Visualization for Top 10 height product categories by rating (reviews) and Top 10 low rating
 
 df_rev_avg.head(10).plot(kind='bar', x = 'product_category_name_english' , y ='avg_review_score', legend = False)
@@ -83,7 +83,7 @@ Order by n.product_category_name_english, review_score;
 """
 df_rev_disc = pd.read_sql_query(query_disc,conn)
 print(df_rev_disc.head(10))
-
+df_rev_disc.to_csv('../DataSet/review3.csv')
 # change table (pivot)
 pivot_rev = df_rev_disc.pivot(index='product_category_name_english', columns = 'review_score', values='counts').fillna(0)
 top_category = pivot_rev.sum(axis=1).sort_values(ascending=False).head(10).index
@@ -115,7 +115,7 @@ FROM reviews
 """
 df_rev_kom = pd.read_sql_query(query_kom,conn)
 print(df_rev_kom)
-
+df_rev_kom.to_csv('../Dataset/comment.csv')
 df_review_delivery = pd.merge(df_c_time, reviews, on = 'order_id', how = 'inner')
 df_review_delivery = df_review_delivery.dropna(subset=['order_delivered_customer_date', 'review_score'])
 avg_score_by_delay = df_review_delivery.groupby('delay_days')['review_score'].mean()

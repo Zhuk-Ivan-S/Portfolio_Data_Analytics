@@ -51,7 +51,7 @@ print('Orders count: ', len(df['order_id'].unique()))
 # 4. Items sold
 print('Items sold: ', len(df['product_id']))
 # 5. Average Check price
-print('Average Check price: ', sum(df['price'])/len(df['order_id'].unique()))
+print('Average Check price: ', sum(df['price'])/len(df['order_id']))
 # 6. Price Distribution (min, max, median and average price + visualization binning)
 medianprice = df['price'].median()
 print(medianprice)
@@ -114,5 +114,6 @@ plt.show()
 avg_pay = df.groupby('payment_type')['price'].mean()
 print(avg_pay)
 
+df.to_csv('../DataSet/final_dataset.csv')
 # thet's give some notice for analyze in future
 conn.close()
